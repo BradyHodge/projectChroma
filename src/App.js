@@ -32,7 +32,6 @@ const App = () => {
   const generateNewPalette = () => {
     setColors(Array(5).fill().map(generateRandomColor));
   };
-// The ER is a bad place to do homework, I wana sleep
   return (
     <div className="app">
       <div className="palette-container">
