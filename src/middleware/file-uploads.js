@@ -28,7 +28,7 @@ const fileUploads = (req, res, next) => {
     if (!req.is('multipart/form-data')) {
         return next();
     }
-  
+
     // Configure formidable options for file handling
     const form = formidable({
         allowEmptyFiles: true,      // Allow empty file uploads or forms would break
