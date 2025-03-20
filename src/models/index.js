@@ -38,7 +38,7 @@ if (process.env.NODE_ENV.toLowerCase().includes('dev')) {
 export const setupDatabase = async () => {
     console.log("database init")
     const sql = fs.readFileSync('./src/models/setup.sql', 'utf-8');
-    await dbClient.exec(sql);
+    await dbClient.query(sql);
 };
 
 // Test function that can be used to test the database
@@ -51,7 +51,6 @@ export const testDatabase = async () => {
         `);
         if (res.rows.length === 0) {
             console.log('No tables found in the database.');
-            setupDatabase();
         } else {
             console.log('Tables in the database:', res.rows.map(row => row.table_name));
         }

@@ -1,0 +1,59 @@
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-icon">
+            <span>!</span>
+        </div>
+        
+        <h1><%= title || 'Error' %></h1>
+        <p class="error-message"><%= message || 'An unexpected error occurred' %></p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn">Return to Home</a>
+            <button class="btn btn-outline" onclick="window.history.back()">Go Back</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+    }
+    
+    .error-card {
+        background-color: white;
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+        padding: var(--spacing-xl);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+    }
+    
+    .error-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: var(--color-accent);
+        color: white;
+        font-size: 50px;
+        font-weight: bold;
+        margin: 0 auto var(--spacing-lg);
+    }
+    
+    .error-message {
+        color: #666;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .error-actions {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-md);
+    }
+</style>

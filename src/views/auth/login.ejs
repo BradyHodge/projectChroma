@@ -1,0 +1,90 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Login</h1>
+            <p>Sign in to your account to create and manage color palettes</p>
+        </div>
+        
+        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+            <div class="error-list">
+                <ul>
+                    <% errors.forEach(error => { %>
+                        <li><%= error.msg %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        <% } %>
+        
+        <form action="/auth/login" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required
+                    value="<%= typeof formData !== 'undefined' ? formData.username : '' %>"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </div>
+        </form>
+        
+        <div class="auth-links">
+            <p>Don't have an account? <a href="/auth/register">Register</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+    }
+    
+    .auth-card {
+        background-color: white;
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+        padding: var(--spacing-lg);
+        width: 100%;
+        max-width: 450px;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .auth-header h1 {
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .auth-header p {
+        color: #666;
+        margin-bottom: 0;
+    }
+    
+    .auth-form {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .auth-links {
+        text-align: center;
+        border-top: 1px solid #eee;
+        padding-top: var(--spacing-md);
+    }
+    
+    .auth-links p {
+        margin-bottom: 0;
+    }
+</style>

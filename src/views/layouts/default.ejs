@@ -1,17 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%- include('../partials/head') %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Color Palette Generator' %></title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+    <!-- Include any additional styles from views -->
+    <% if (typeof styles !== 'undefined' && styles.length > 0) { %>
+        <% styles.forEach(style => { %>
+            <%- style %>
+        <% }) %>
+    <% } %>
 </head>
 <body>
-    <header>
-        <%- include('../partials/header') %>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <h1>Color Palette Generator</h1>
+                </a>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/palettes">Explore</a></li>
+                    <li><a href="/palettes/trending">Trending</a></li>
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <li><a href="/palettes/create">Create Palette</a></li>
+                        <li><a href="/palettes/user/<%= user.username %>">My Palettes</a></li>
+                        <% if (user.role_id === 2 || user.role_id === 3) { %>
+                            <li><a href="/admin">Admin</a></li>
+                        <% } %>
+                        <li><a href="/auth/logout">Logout</a></li>
+                    <% } else { %>
+                        <li><a href="/auth/login">Login</a></li>
+                        <li><a href="/auth/register">Register</a></li>
+                    <% } %>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
+
     <main>
-        <%- body %>
+        <div class="container">
+            <%- body %>
+        </div>
     </main>
-    <footer>
-        <%- include('../partials/footer') %>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; <%= new Date().getFullYear() %> Color Palette Generator. All rights reserved.</p>
+        </div>
     </footer>
+
+    <!-- JavaScript -->
+    <script src="/js/main.js"></script>
+    
+    <!-- Include any additional scripts from views -->
+    <% if (typeof scripts !== 'undefined' && scripts.length > 0) { %>
+        <% scripts.forEach(script => { %>
+            <%- script %>
+        <% }) %>
+    <% } %>
 </body>
 </html>

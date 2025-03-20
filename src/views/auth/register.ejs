@@ -1,0 +1,130 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Register</h1>
+            <p>Create an account to start making beautiful color palettes</p>
+        </div>
+        
+        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+            <div class="error-list">
+                <ul>
+                    <% errors.forEach(error => { %>
+                        <li><%= error.msg %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        <% } %>
+        
+        <form action="/auth/register" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required
+                    minlength="3"
+                    maxlength="50"
+                    pattern="[a-zA-Z0-9_]+"
+                    title="Username can only contain letters, numbers, and underscores"
+                    value="<%= typeof formData !== 'undefined' ? formData.username : '' %>"
+                >
+                <small class="form-text">Only letters, numbers, and underscores allowed</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required
+                    value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required
+                    minlength="8"
+                >
+                <small class="form-text">Password must be at least 8 characters long</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    required
+                >
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            </div>
+        </form>
+        
+        <div class="auth-links">
+            <p>Already have an account? <a href="/auth/login">Login</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+    }
+    
+    .auth-card {
+        background-color: white;
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+        padding: var(--spacing-lg);
+        width: 100%;
+        max-width: 450px;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .auth-header h1 {
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .auth-header p {
+        color: #666;
+        margin-bottom: 0;
+    }
+    
+    .auth-form {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .form-text {
+        display: block;
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: var(--spacing-xs);
+    }
+    
+    .auth-links {
+        text-align: center;
+        border-top: 1px solid #eee;
+        padding-top: var(--spacing-md);
+    }
+    
+    .auth-links p {
+        margin-bottom: 0;
+    }
+</style>
