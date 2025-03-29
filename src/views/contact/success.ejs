@@ -1,0 +1,66 @@
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">
+            <span>✓</span>
+        </div>
+        
+        <h1>Message Sent!</h1>
+        <p>Thank you for contacting us. We've received your message and will respond as soon as possible.</p>
+        
+        <div class="success-actions">
+            <a href="/" class="btn btn-primary">Return to Home</a>
+            <a href="/contact" class="btn btn-outline">Send Another Message</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+    }
+    
+    .success-card {
+        background-color: white;
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+        padding: var(--spacing-xl);
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+    }
+    
+    .success-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: var(--color-success);
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        margin: 0 auto var(--spacing-lg);
+    }
+    
+    .success-card p {
+        color: #666;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .success-actions {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-md);
+    }
+    
+    @media (max-width: 576px) {
+        .success-actions {
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+    }
+</style>

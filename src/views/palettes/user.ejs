@@ -1,0 +1,423 @@
+<div class="user-palettes-container">
+    <div class="user-header">
+        <h1><%= username %>'s Palettes</h1>
+        
+        <% if (isOwnProfile) { %>
+            <div class="profile-actions">
+                <a href="/palettes/create" class="btn btn-primary">Create New Palette</a>
+            </div>
+        <% } %>
+    </div>
+    
+    <% if (isDisabled) { %>
+        <div class="alert alert-warning">
+            This account has been disabled. The user cannot create new palettes or perform other actions.
+        </div>
+    <% } %>
+    
+    <div class="palette-stats">
+        <div class="stat-card">
+            <div class="stat-number"><%= palettes.length %></div>
+            <div class="stat-label">Palettes Created</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-number">
+                <%= palettes.reduce((sum, palette) => sum + parseInt(palette.upvote_count), 0) %>
+            </div>
+            <div class="stat-label">Total Upvotes</div>
+        </div>
+    </div>
+    
+    <div class="palettes-filter">
+        <div class="filter-controls">
+            <label for="sort-filter">Sort By:</label>
+            <select id="sort-filter" class="form-control">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="most-upvotes">Most Upvotes</option>
+                <option value="most-colors">Most Colors</option>
+                <option value="least-colors">Least Colors</option>
+            </select>
+            
+            <% if (isOwnProfile) { %>
+                <label class="visibility-filter">
+                    <input type="checkbox"  
+                    checked
+                    id="show-private" /> Show Private Palettes
+                </label>
+            <% } %>
+        </div>
+    </div>
+    
+    <div class="palette-container" id="palettes-grid">
+        <% if (palettes && palettes.length > 0) { %>
+            <% palettes.forEach(palette => { %>
+                <div class="card palette-card <%= !palette.is_public ? 'private-palette' : '' %>" 
+                     data-upvotes="<%= palette.upvote_count %>" 
+                     data-colors="<%= palette.colors.length %>" 
+                     data-date="<%= new Date(palette.created_at).getTime() %>"
+                     data-public="<%= palette.is_public %>">
+                    
+                    <div class="palette-colors">
+                        <% palette.colors.forEach(color => { %>
+                            <div class="palette-color" style="background-color: <%= color %>"></div>
+                        <% }) %>
+                    </div>
+                    
+                    <div class="palette-info">
+                        <h3>
+                            <a href="/palettes/<%= palette.palette_id %>"><%= palette.name %></a>
+                            <% if (!palette.is_public) { %>
+                                <span class="private-badge">Private</span>
+                            <% } %>
+                        </h3>
+                        <p><%= palette.description ? (palette.description.length > 60 ? palette.description.substring(0, 60) + '...' : palette.description) : '' %></p>
+                        <div class="palette-meta">
+                            <span><%= new Date(palette.created_at).toLocaleDateString() %></span>
+                            <span><%= palette.colors.length %> colors</span>
+                        </div>
+                    </div>
+                    
+                    <div class="palette-actions">
+                        <div class="action-buttons">
+                            <a href="/palettes/<%= palette.palette_id %>" class="btn btn-sm">View</a>
+                            <% if (isOwnProfile) { %>
+                                <a href="/palettes/<%= palette.palette_id %>/edit" class="btn btn-sm">Edit</a>
+                                <form action="/palettes/<%= palette.palette_id %>/delete" method="POST" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this palette?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            <% } %>
+                        </div>
+                        
+                        <div class="palette-upvotes">
+                            <% if (user && user.user_id !== palette.user_id) { %>
+                                <button class="upvote-btn <%= palette.hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
+                                    <span class="upvote-icon">▲</span>
+                                    <span class="upvote-count"><%= palette.upvote_count %></span>
+                                </button>
+                            <% } else { %>
+                                <div class="upvote-display">
+                                    <span class="upvote-icon">▲</span>
+                                    <span class="upvote-count"><%= palette.upvote_count %></span>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="empty-state">
+                <p>No palettes found.</p>
+                <% if (isOwnProfile) { %>
+                    <a href="/palettes/create" class="btn">Create Your First Palette</a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle upvote buttons
+        document.querySelectorAll('.upvote-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const paletteId = this.getAttribute('data-palette-id');
+                const countEl = this.querySelector('.upvote-count');
+                
+                try {
+                    const response = await fetch(`/palettes/${paletteId}/upvote`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const currentCount = parseInt(countEl.textContent);
+                        
+                        if (data.action === 'added') {
+                            countEl.textContent = currentCount + 1;
+                            this.classList.add('active');
+                        } else {
+                            countEl.textContent = currentCount - 1;
+                            this.classList.remove('active');
+                        }
+                        
+                        // Update the data-upvotes attribute for sorting
+                        this.closest('.palette-card').setAttribute('data-upvotes', data.action === 'added' ? currentCount + 1 : currentCount - 1);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+        
+        // Handle sorting
+        const sortFilter = document.getElementById('sort-filter');
+        if (sortFilter) {
+            sortFilter.addEventListener('change', function() {
+                sortPalettes(this.value);
+            });
+        }
+        
+        // Handle visibility toggle
+        const showPrivateCheckbox = document.getElementById('show-private');
+        if (showPrivateCheckbox) {
+            showPrivateCheckbox.addEventListener('change', function() {
+                togglePrivatePalettes(this.checked);
+            });
+        }
+        
+        // Sort palettes function
+        function sortPalettes(sortBy) {
+            const palettesGrid = document.getElementById('palettes-grid');
+            const paletteCards = Array.from(palettesGrid.querySelectorAll('.palette-card'));
+            
+            paletteCards.sort((a, b) => {
+                switch (sortBy) {
+                    case 'newest':
+                        return parseInt(b.getAttribute('data-date')) - parseInt(a.getAttribute('data-date'));
+                    case 'oldest':
+                        return parseInt(a.getAttribute('data-date')) - parseInt(b.getAttribute('data-date'));
+                    case 'most-upvotes':
+                        return parseInt(b.getAttribute('data-upvotes')) - parseInt(a.getAttribute('data-upvotes'));
+                    case 'most-colors':
+                        return parseInt(b.getAttribute('data-colors')) - parseInt(a.getAttribute('data-colors'));
+                    case 'least-colors':
+                        return parseInt(a.getAttribute('data-colors')) - parseInt(b.getAttribute('data-colors'));
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Remove all cards from the grid
+            paletteCards.forEach(card => card.remove());
+            
+            // Add sorted cards back to the grid
+            paletteCards.forEach(card => palettesGrid.appendChild(card));
+        }
+        
+        // Toggle private palettes function
+        function togglePrivatePalettes(showPrivate) {
+            const privatePalettes = document.querySelectorAll('.private-palette');
+            
+            privatePalettes.forEach(palette => {
+                if (showPrivate) {
+                    palette.style.display = '';
+                } else {
+                    palette.style.display = 'none';
+                }
+            });
+        }
+        
+        
+        togglePrivatePalettes(true);
+    });
+</script>
+
+<style>
+    .user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+    }
+    
+    .palette-stats {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .stat-card {
+        background-color: white;
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-sm);
+        flex: 1;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--color-primary);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.875rem;
+    }
+    
+    .palettes-filter {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .filter-controls {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+    
+    .visibility-filter {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+    
+    .private-badge {
+        display: inline-block;
+        background-color: var(--color-warning);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--border-radius-sm);
+        margin-left: var(--spacing-xs);
+        vertical-align: middle;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: var(--spacing-xs);
+    }
+    
+    .delete-form {
+        display: inline;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-lg);
+        background-color: #f9f9f9;
+        border-radius: var(--border-radius-md);
+        grid-column: 1 / -1;
+    }
+    
+    .palette-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--spacing-md);
+    }
+    
+    .palette-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .palette-colors {
+        display: flex;
+        height: 150px;
+        border-top-left-radius: var(--border-radius-md);
+        border-top-right-radius: var(--border-radius-md);
+        overflow: hidden;
+    }
+    
+    .palette-color {
+        flex: 1;
+        transition: flex 0.3s ease;
+    }
+    
+    .palette-color:hover {
+        flex: 1.5;
+    }
+    
+    .palette-info {
+        padding: var(--spacing-md);
+        flex: 1;
+    }
+    
+    .palette-info h3 {
+        margin-top: 0;
+        margin-bottom: var(--spacing-xs);
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .palette-info p {
+        margin-bottom: var(--spacing-xs);
+        font-size: 0.875rem;
+        color: #666;
+    }
+    
+    .palette-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #888;
+    }
+    
+    .palette-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-top: 1px solid #eee;
+    }
+    
+    .upvote-btn {
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        padding: var(--spacing-xs);
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        transition: color 0.2s ease;
+    }
+    
+    .upvote-btn:hover {
+        color: var(--color-accent);
+    }
+    
+    .upvote-btn.active {
+        color: var(--color-accent);
+    }
+    
+    .upvote-count {
+        margin-left: var(--spacing-xs);
+    }
+    
+    .upvote-display {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        font-size: 0.875rem;
+        color: #888;
+    }
+    
+    @media (max-width: 768px) {
+        .user-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+        
+        .palette-stats {
+            flex-direction: column;
+        }
+        
+        .filter-controls {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+        }
+        
+        .action-buttons {
+            flex-wrap: wrap;
+        }
+    }
+</style>

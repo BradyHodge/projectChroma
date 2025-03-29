@@ -7,7 +7,7 @@ const router = Router();
 const isAdmin = async (req, res, next) => {
     if (!req.session.user) {
         req.session.returnTo = req.originalUrl;
-        return res.redirect('/login');
+        return res.redirect('/auth/login');
     }
 
     try {

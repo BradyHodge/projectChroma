@@ -4,7 +4,7 @@
         <p class="hero-subtitle">Design, save, and share color combinations for your next project</p>
         
         <div class="hero-actions">
-            <% if (!user) { %>
+            <% if (typeof user === 'undefined') { %>
                 <a href="/auth/register" class="btn btn-primary btn-lg">Get Started</a>
                 <a href="/auth/login" class="btn btn-outline btn-lg">Login</a>
             <% } else { %>
@@ -135,7 +135,7 @@
     </div>
 </section>
 
-<% if (!user) { %>
+<% if (typeof user === 'undefined') { %>
 <section class="cta-section">
     <h2>Ready to Create?</h2>
     <p>Join our community and start designing beautiful color palettes today.</p>

@@ -3,9 +3,9 @@ import path from 'path';
 
 /** @type {Array<{route: string, dir: string}|string>} Static path configurations */
 const staticPaths = [
-   { route: '/css', dir: 'public/css' },
-   { route: '/js', dir: 'public/js' },
-   { route: '/images', dir: 'public/images' }
+    { route: '/css', dir: 'public/css' },
+    { route: '/js', dir: 'public/js' },
+    { route: '/images', dir: 'public/images' }
 ];
 
 /**
@@ -33,6 +33,7 @@ const configureStaticPaths = (app) => {
 
     // Update the app settings with the newly registered paths
     app.set('staticPaths', Array.from(registeredPaths));
+    console.log(registeredPaths)
 };
 
 /**

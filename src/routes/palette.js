@@ -9,14 +9,14 @@ const isAuthenticated = (req, res, next) => {
     if (req.session.user) {
         return next();
     }
-    res.redirect('/login');
+    res.redirect('/auth/login');
 };
 
 // Permission checking middleware
 const hasPermission = (permission) => {
     return async (req, res, next) => {
         if (!req.session.user) {
-            return res.redirect('/login');
+            return res.redirect('auth/login');
         }
 
         try {
@@ -126,6 +126,21 @@ router.post(
     '/create',
     isAuthenticated,
     hasPermission('create_palettes'),
+    (req, res, next) => {
+        if (typeof req.body.colors === 'string') {
+            try {
+                req.body.colors = JSON.parse(req.body.colors);
+            } catch (err) {t
+            }
+        }
+        if (req.body.isPublic === undefined) {
+            req.body.isPublic = false;
+        } else if (req.body.isPublic === 'true') {
+            req.body.isPublic = true;
+        }
+        
+        next();
+    },
     [
         body('name').trim().isLength({ min: 3, max: 100 }).withMessage('Palette name must be between 3 and 100 characters'),
         body('description').trim().isLength({ max: 500 }).withMessage('Description cannot exceed 500 characters'),
@@ -227,8 +242,10 @@ router.get('/:id', async (req, res) => {
             hasUpvoted = upvoteResult.rows.length > 0;
         }
 
+        const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
         res.render('palettes/view', { 
             title: palette.name,
+            fullUrl: fullUrl,
             palette,
             hasUpvoted,
             isOwner: req.session.user && req.session.user.user_id === palette.user_id,

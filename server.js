@@ -26,7 +26,6 @@ app.use(configNodeEnv);
 
 // Configure static paths (public dirs) for the Express application
 configureStaticPaths(app);
-
 // Set up session middleware with PostgreSQL session store
 const PostgresqlStore = pgSession(expressSession);
 app.use(expressSession({
@@ -35,7 +34,7 @@ app.use(expressSession({
         tableName: 'SESSIONS',
         createTableIfMissing: true
     }),
-    secret: process.env.SESSION_SECRET || 'color-palette-secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { 
@@ -124,6 +123,6 @@ if (mode.includes('dev')) {
 // Start the Express server
 app.listen(port, async () => {
     await testDatabase();
-    await setupDatabase();
+    // await setupDatabase();
     console.log(`Server running on http://127.0.0.1:${port}`);
 });
