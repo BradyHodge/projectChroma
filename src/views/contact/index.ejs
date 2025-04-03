@@ -54,7 +54,7 @@
         <div class="info-item">
             <h3>Login Status</h3>
             <p>
-                <% if (user) { %>
+                <% if (user && (typeof user !== 'undefined')) { %>
                     You are logged in as <strong><%= user.username %></strong>. Your contact information will be associated with your account.
                 <% } else { %>
                     You are not logged in. If you'd like your message to be associated with your account, please <a href="/auth/login">log in</a> first.

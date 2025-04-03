@@ -1,0 +1,120 @@
+<h1 class="admin-heading">User Management</h1>
+
+<nav class="admin-nav">
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/users" class="active">User Management</a>
+    <a href="/admin/palettes">Palette Management</a>
+    <a href="/admin/messages">Contact Messages</a>
+</nav>
+
+<div class="admin-section">
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Created</th>
+                    <th>Last Login</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (users && users.length > 0) { %>
+                    <% users.forEach(user => { %>
+                        <tr id="user-row-<%= user.user_id %>">
+                            <td><%= user.user_id %></td>
+                            <td><%= user.username %></td>
+                            <td><%= user.email %></td>
+                            <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+                            <td><%= user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never' %></td>
+                            <td id="user-role-<%= user.user_id %>"><%= user.role_name %></td>
+                            <td id="user-status-<%= user.user_id %>" class="<%= user.is_disabled ? 'text-danger' : 'text-success' %>">
+                                <%= user.is_disabled ? 'Disabled' : 'Active' %>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="/palettes/user/<%= user.username %>" class="btn btn-sm">View Palettes</a>
+                                    
+                                    <% if (user.user_id !== locals.user.user_id) { %>
+                                        <button 
+                                            class="btn btn-sm <%= user.is_disabled ? 'btn-success' : 'btn-warning' %> toggle-user-status" 
+                                            data-user-id="<%= user.user_id %>"
+                                        >
+                                            <%= user.is_disabled ? 'Enable' : 'Disable' %>
+                                        </button>
+                                        
+                                        <% if (isAdministrator) { %>
+                                            <form class="change-role-form" data-user-id="<%= user.user_id %>">
+                                                <select name="roleId" class="role-select">
+                                                    <option value="1" <%= user.role_name === 'Default' ? 'selected' : '' %>>Default</option>
+                                                    <option value="2" <%= user.role_name === 'Moderator' ? 'selected' : '' %>>Moderator</option>
+                                                    <option value="3" <%= user.role_name === 'Administrator' ? 'selected' : '' %>>Administrator</option>
+                                                    <option value="4" <%= user.role_name === 'Disabled' ? 'selected' : '' %>>Disabled</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm">Change Role</button>
+                                            </form>
+                                            
+                                            <button 
+                                                class="btn btn-sm btn-danger delete-user-btn" 
+                                                data-user-id="<%= user.user_id %>"
+                                            >
+                                                Delete
+                                            </button>
+                                        <% } %>
+                                    <% } else { %>
+                                        <span class="current-user-badge">Current User</span>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8" class="empty-table">No users found</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .change-role-form {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        margin: var(--spacing-xs) 0;
+    }
+    
+    .role-select {
+        padding: var(--spacing-xs);
+        border-radius: var(--border-radius-sm);
+        border: 1px solid #ddd;
+    }
+    
+    .admin-table .actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .text-success {
+        color: var(--color-success);
+    }
+    
+    .text-danger {
+        color: var(--color-danger);
+    }
+    
+    .current-user-badge {
+        display: inline-block;
+        background-color: #f0f0f0;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.75rem;
+    }
+</style>

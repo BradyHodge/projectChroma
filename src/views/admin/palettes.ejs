@@ -1,0 +1,92 @@
+<h1 class="admin-heading">Palette Management</h1>
+
+<nav class="admin-nav">
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/users">User Management</a>
+    <a href="/admin/palettes" class="active">Palette Management</a>
+    <a href="/admin/messages">Contact Messages</a>
+</nav>
+
+<div class="admin-section">
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Creator</th>
+                    <th>Created</th>
+                    <th>Upvotes</th>
+                    <th>Visibility</th>
+                    <th>Colors</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (palettes && palettes.length > 0) { %>
+                    <% palettes.forEach(palette => { %>
+                        <tr id="palette-row-<%= palette.palette_id %>">
+                            <td><%= palette.palette_id %></td>
+                            <td><%= palette.name %></td>
+                            <td><%= palette.username %></td>
+                            <td><%= new Date(palette.created_at).toLocaleDateString() %></td>
+                            <td><%= palette.upvote_count %></td>
+                            <td><%= palette.is_public ? 'Public' : 'Private' %></td>
+                            <td>
+                                <div class="color-preview">
+                                    <% if (palette.colors && palette.colors.length > 0) { %>
+                                        <% palette.colors.slice(0, 5).forEach(color => { %>
+                                            <div class="color-dot" style="background-color: <%= color %>"></div>
+                                        <% }) %>
+                                        <% if (palette.colors.length > 5) { %>
+                                            <div class="color-more">+<%= palette.colors.length - 5 %></div>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="/palettes/<%= palette.palette_id %>" class="btn btn-sm">View</a>
+                                    <a href="/palettes/<%= palette.palette_id %>/edit" class="btn btn-sm">Edit</a>
+                                    
+                                    <% if (isAdministrator) { %>
+                                        <button 
+                                            class="btn btn-sm btn-danger delete-palette-btn" 
+                                            data-palette-id="<%= palette.palette_id %>"
+                                        >
+                                            Delete
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8" class="empty-table">No palettes found</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .color-preview {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+    
+    .color-dot {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .color-more {
+        font-size: 0.7rem;
+        color: #888;
+    }
+</style>

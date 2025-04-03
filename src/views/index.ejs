@@ -39,7 +39,7 @@
                     <div class="palette-actions">
                         <a href="/palettes/<%= palette.palette_id %>" class="btn btn-sm">View Details</a>
                         <div class="palette-upvotes">
-                            <button class="upvote-btn <%= user && user.hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
+                            <button class="upvote-btn <%= !(typeof user === 'undefined') && user.hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
                                 <span class="upvote-icon">▲</span>
                                 <span class="upvote-count"><%= palette.upvote_count %></span>
                             </button>
@@ -84,7 +84,7 @@
                     <div class="palette-actions">
                         <a href="/palettes/<%= palette.palette_id %>" class="btn btn-sm">View Details</a>
                         <div class="palette-upvotes">
-                            <button class="upvote-btn <%= user && user.hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
+                            <button class="upvote-btn <%= !(typeof user === 'undefined') && user.hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
                                 <span class="upvote-icon">▲</span>
                                 <span class="upvote-count"><%= palette.upvote_count %></span>
                             </button>

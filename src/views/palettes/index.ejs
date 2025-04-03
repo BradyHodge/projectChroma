@@ -13,7 +13,7 @@
         </div>
     </div>
     
-    <% if (user) { %>
+    <% if (typeof user !== 'undefined') { %>
         <div class="create-action">
             <a href="/palettes/create" class="btn btn-primary">Create New Palette</a>
         </div>
@@ -39,7 +39,7 @@
                     <div class="palette-actions">
                         <a href="/palettes/<%= palette.palette_id %>" class="btn btn-sm">View Details</a>
                         <div class="palette-upvotes">
-                            <% if (user) { %>
+                            <% if (typeof user !== 'undefined') { %>
                                 <button class="upvote-btn <%= palette.hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
                                     <span class="upvote-icon">▲</span>
                                     <span class="upvote-count"><%= palette.upvote_count %></span>
@@ -57,7 +57,7 @@
         <% } else { %>
             <div class="empty-state">
                 <p>No palettes found.</p>
-                <% if (user) { %>
+                <% if (typeof user !== 'undefined') { %>
                     <a href="/palettes/create" class="btn">Create New Palette</a>
                 <% } else { %>
                     <a href="/auth/login" class="btn">Login to Create</a>

@@ -1,0 +1,345 @@
+<h1 class="admin-heading">Contact Messages</h1>
+
+<nav class="admin-nav">
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/users">User Management</a>
+    <a href="/admin/palettes">Palette Management</a>
+    <a href="/admin/messages" class="active">Contact Messages</a>
+</nav>
+
+<div class="admin-section">
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Subject</th>
+                    <th>From</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Resolved By</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (messages && messages.length > 0) { %>
+                    <% messages.forEach(message => { %>
+                        <tr id="message-row-<%= message.message_id %>" class="<%= message.is_resolved ? 'resolved-row' : '' %>">
+                            <td><%= message.message_id %></td>
+                            <td>
+                                <a href="#" class="message-subject" data-message-id="<%= message.message_id %>">
+                                    <%= message.subject %>
+                                </a>
+                            </td>
+                            <td><%= message.submitted_by || 'Anonymous' %></td>
+                            <td><%= new Date(message.submitted_at).toLocaleDateString() %></td>
+                            <td class="message-status <%= message.is_resolved ? 'text-success' : 'text-warning' %>">
+                                <%= message.is_resolved ? 'Resolved' : 'Open' %>
+                            </td>
+                            <td>
+                                <%= message.is_resolved ? (message.resolved_by || 'Unknown') : '-' %>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <button 
+                                        class="btn btn-sm view-message-btn" 
+                                        data-message-id="<%= message.message_id %>"
+                                        data-subject="<%= message.subject %>"
+                                        data-content="<%= message.message_content %>"
+                                        data-from="<%= message.submitted_by || 'Anonymous' %>"
+                                        data-date="<%= new Date(message.submitted_at).toLocaleString() %>"
+                                    >
+                                        View
+                                    </button>
+                                    
+                                    <% if (!message.is_resolved) { %>
+                                        <button 
+                                            class="btn btn-sm btn-success resolve-message-btn" 
+                                            data-message-id="<%= message.message_id %>"
+                                        >
+                                            Mark Resolved
+                                        </button>
+                                    <% } else { %>
+                                        <button 
+                                            class="btn btn-sm" 
+                                            disabled
+                                        >
+                                            Resolved
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="7" class="empty-table">No contact messages found</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div id="message-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-subject"></h3>
+            <span class="modal-close">&times;</span>
+        </div>
+        <div class="modal-info">
+            <div class="modal-meta">
+                <span>From: <span id="modal-from"></span></span>
+                <span>Date: <span id="modal-date"></span></span>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p id="modal-content"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="modal-resolve-btn" class="btn btn-success">Mark as Resolved</button>
+            <button class="btn modal-close-btn">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .resolved-row {
+        background-color: #f9f9f9;
+        color: #888;
+    }
+    
+    .text-warning {
+        color: var(--color-warning);
+    }
+    
+    .message-subject {
+        font-weight: 500;
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        overflow: auto;
+    }
+    
+    .modal-content {
+        position: relative;
+        margin: 10% auto;
+        background-color: white;
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-lg);
+        width: 80%;
+        max-width: 700px;
+        animation: modalFadeIn 0.3s;
+    }
+    
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-bottom: 1px solid #eee;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+    }
+    
+    .modal-close {
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .modal-info {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .modal-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.875rem;
+    }
+    
+    .modal-body {
+        padding: var(--spacing-lg);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .modal-footer {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-top: 1px solid #eee;
+        text-align: right;
+    }
+    
+    .modal-footer button {
+        margin-left: var(--spacing-sm);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal elements
+        const modal = document.getElementById('message-modal');
+        const modalSubject = document.getElementById('modal-subject');
+        const modalFrom = document.getElementById('modal-from');
+        const modalDate = document.getElementById('modal-date');
+        const modalContent = document.getElementById('modal-content');
+        const modalResolveBtn = document.getElementById('modal-resolve-btn');
+        const modalCloseButtons = document.querySelectorAll('.modal-close, .modal-close-btn');
+        
+        // View message buttons
+        document.querySelectorAll('.view-message-btn, .message-subject').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const messageId = this.getAttribute('data-message-id');
+                const subject = this.getAttribute('data-subject');
+                const content = this.getAttribute('data-content');
+                const from = this.getAttribute('data-from');
+                const date = this.getAttribute('data-date');
+                
+                // Populate modal
+                modalSubject.textContent = subject;
+                modalFrom.textContent = from;
+                modalDate.textContent = date;
+                modalContent.textContent = content;
+                
+                // Configure resolve button
+                const messageRow = document.getElementById(`message-row-${messageId}`);
+                const isResolved = messageRow.classList.contains('resolved-row');
+                
+                if (isResolved) {
+                    modalResolveBtn.style.display = 'none';
+                } else {
+                    modalResolveBtn.style.display = 'inline-block';
+                    modalResolveBtn.setAttribute('data-message-id', messageId);
+                }
+                
+                // Show modal
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            });
+        });
+        
+        // Close modal
+        modalCloseButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Allow scrolling
+            });
+        });
+        
+        // Close when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Allow scrolling
+            }
+        });
+        
+        // Resolve button in modal
+        modalResolveBtn.addEventListener('click', async function() {
+            const messageId = this.getAttribute('data-message-id');
+            await resolveMessage(messageId);
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Allow scrolling
+        });
+        
+        // Resolve message buttons
+        document.querySelectorAll('.resolve-message-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const messageId = this.getAttribute('data-message-id');
+                await resolveMessage(messageId);
+            });
+        });
+        
+        // Function to resolve a message
+        async function resolveMessage(messageId) {
+            try {
+                const response = await fetch(`/admin/messages/${messageId}/resolve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const messageRow = document.getElementById(`message-row-${messageId}`);
+                    messageRow.classList.add('resolved-row');
+                    
+                    // Update status cell
+                    const statusCell = messageRow.querySelector('.message-status');
+                    if (statusCell) {
+                        statusCell.textContent = 'Resolved';
+                        statusCell.className = 'message-status text-success';
+                    }
+                    
+                    // Update actions cell
+                    const actionsCell = messageRow.querySelector('.actions');
+                    if (actionsCell) {
+                        actionsCell.innerHTML = `
+                            <button class="btn btn-sm view-message-btn" 
+                                data-message-id="${messageId}"
+                                data-subject="${messageRow.querySelector('.message-subject').getAttribute('data-subject')}"
+                                data-content="${messageRow.querySelector('.message-subject').getAttribute('data-content')}"
+                                data-from="${messageRow.querySelector('.message-subject').getAttribute('data-from')}"
+                                data-date="${messageRow.querySelector('.message-subject').getAttribute('data-date')}">
+                                View
+                            </button>
+                            <button class="btn btn-sm" disabled>Resolved</button>
+                        `;
+                        
+                        // Re-attach event listener
+                        actionsCell.querySelector('.view-message-btn').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            
+                            const subject = this.getAttribute('data-subject');
+                            const content = this.getAttribute('data-content');
+                            const from = this.getAttribute('data-from');
+                            const date = this.getAttribute('data-date');
+                            
+                            // Populate modal
+                            modalSubject.textContent = subject;
+                            modalFrom.textContent = from;
+                            modalDate.textContent = date;
+                            modalContent.textContent = content;
+                            
+                            // Hide resolve button
+                            modalResolveBtn.style.display = 'none';
+                            
+                            // Show modal
+                            modal.style.display = 'block';
+                            document.body.style.overflow = 'hidden'; // Prevent scrolling
+                        });
+                    }
+                } else {
+                    alert('An error occurred');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred');
+            }
+        }
+    });
+</script>

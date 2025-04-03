@@ -16,7 +16,7 @@
                 </form>
             <% } %>
             
-            <% if (user) { %>
+            <% if (typeof user !== 'undefined') { %>
                 <button class="upvote-btn <%= hasUpvoted ? 'active' : '' %>" data-palette-id="<%= palette.palette_id %>">
                     <span class="upvote-icon">▲</span>
                     <span class="upvote-count"><%= palette.upvote_count %></span>

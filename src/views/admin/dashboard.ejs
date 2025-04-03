@@ -1,0 +1,196 @@
+<h1 class="admin-heading">Admin Dashboard</h1>
+
+<nav class="admin-nav">
+    <a href="/admin" class="active">Dashboard</a>
+    <a href="/admin/users">User Management</a>
+    <a href="/admin/palettes">Palette Management</a>
+    <a href="/admin/messages">Contact Messages</a>
+</nav>
+
+<div class="admin-stats">
+    <div class="stat-card">
+        <div class="stat-number"><%= stats.user_count %></div>
+        <div class="stat-label">Registered Users</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number"><%= stats.palette_count %></div>
+        <div class="stat-label">Total Palettes</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number"><%= stats.upvote_count %></div>
+        <div class="stat-label">Total Upvotes</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number"><%= stats.open_messages %></div>
+        <div class="stat-label">Open Messages</div>
+    </div>
+</div>
+
+<div class="admin-sections">
+    <div class="admin-section">
+        <h2>Recent Users</h2>
+        
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (recentUsers && recentUsers.length > 0) { %>
+                        <% recentUsers.forEach(user => { %>
+                            <tr id="user-row-<%= user.user_id %>">
+                                <td><%= user.username %></td>
+                                <td><%= user.email %></td>
+                                <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+                                <td>
+                                    <div class="actions">
+                                        <a href="/admin/users#user-<%= user.user_id %>" class="btn btn-sm">View</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="empty-table">No users found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="admin-section-action">
+            <a href="/admin/users" class="btn">Manage All Users</a>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h2>Recent Palettes</h2>
+        
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Creator</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (recentPalettes && recentPalettes.length > 0) { %>
+                        <% recentPalettes.forEach(palette => { %>
+                            <tr id="palette-row-<%= palette.palette_id %>">
+                                <td><%= palette.name %></td>
+                                <td><%= palette.username %></td>
+                                <td><%= new Date(palette.created_at).toLocaleDateString() %></td>
+                                <td>
+                                    <div class="actions">
+                                        <a href="/palettes/<%= palette.palette_id %>" class="btn btn-sm">View</a>
+                                        <a href="/admin/palettes#palette-<%= palette.palette_id %>" class="btn btn-sm">Manage</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="empty-table">No palettes found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="admin-section-action">
+            <a href="/admin/palettes" class="btn">Manage All Palettes</a>
+        </div>
+    </div>
+</div>
+
+<% if (user && user.role_id === 3) { %>
+    <div class="admin-section">
+        <h2>Administration</h2>
+        
+        <div class="admin-actions">
+            <% if (stats.open_messages > 0) { %>
+                <a href="/admin/messages" class="btn btn-accent">
+                    <span class="badge"><%= stats.open_messages %></span> Open Messages
+                </a>
+            <% } %>
+        </div>
+    </div>
+<% } %>
+
+<style>
+    .admin-heading {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .admin-sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .admin-section {
+        background-color: white;
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .admin-section h2 {
+        border-bottom: 1px solid #eee;
+        padding-bottom: var(--spacing-xs);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .table-container {
+        overflow-x: auto;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .empty-table {
+        text-align: center;
+        padding: var(--spacing-lg);
+        color: #888;
+    }
+    
+    .admin-section-action {
+        text-align: right;
+    }
+    
+    .admin-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+    
+    .badge {
+        display: inline-block;
+        background-color: white;
+        color: var(--color-accent);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-right: var(--spacing-xs);
+    }
+    
+    @media (max-width: 992px) {
+        .admin-sections {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
