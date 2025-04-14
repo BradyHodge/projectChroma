@@ -33,7 +33,7 @@ const configureStaticPaths = (app) => {
 
     // Update the app settings with the newly registered paths
     app.set('staticPaths', Array.from(registeredPaths));
-    console.log(registeredPaths)
+    // console.log(registeredPaths)
 };
 
 /**
