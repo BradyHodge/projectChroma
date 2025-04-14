@@ -123,6 +123,6 @@ if (mode.includes('dev')) {
 // Start the Express server
 app.listen(port, async () => {
     await testDatabase();
-    // await setupDatabase();
+    await setupDatabase();
     console.log(`Server running on http://127.0.0.1:${port}`);
 });

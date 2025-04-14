@@ -1,0 +1,11 @@
+services:
+  nodejs-server:
+    build: .
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - DB_URL=${DB_URL}
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT:-3000}
+      - SESSION_SECRET=${SESSION_SECRET}
+    restart: unless-stopped
