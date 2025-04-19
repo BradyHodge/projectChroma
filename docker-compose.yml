@@ -4,34 +4,8 @@ services:
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
     environment:
+      - DB_URL=${DB_URL}
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT:-3000}
       - SESSION_SECRET=${SESSION_SECRET}
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME:-postgres}
-    depends_on:
-      - postgres
     restart: unless-stopped
-    networks:
-      - app-network
-  postgres:
-    image: postgres:latest
-    ports:
-      - "${DB_PORT:-5432}:5432"
-    environment:
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME:-postgres}
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    restart: unless-stopped
-    networks:
-      - app-network
-networks:
-  app-network:
-    driver: bridge
-volumes:
-  postgres-data:

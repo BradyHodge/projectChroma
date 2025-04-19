@@ -4,12 +4,9 @@ import fs from 'fs';
 const { Pool } = pg;
 
 const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-    });
+    connectionString: process.env.DB_URL,
+    ssl: false
+});
 
 let dbClient;
 
@@ -54,7 +51,6 @@ export const testDatabase = async () => {
         `);
         if (res.rows.length === 0) {
             console.log('No tables found in the database.');
-            await setupDatabase();
         } else {
             console.log('Tables in the database:', res.rows.map(row => row.table_name));
         }
