@@ -30,18 +30,20 @@ configureStaticPaths(app);
 const PostgresqlStore = pgSession(expressSession);
 app.use(expressSession({
     store: new PostgresqlStore({
-        conString: process.env.DB_URL,
-        tableName: 'SESSIONS',
-        createTableIfMissing: true
+      conString: process.env.DB_URL,
+      tableName: 'SESSIONS',
+      createTableIfMissing: true
     }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { 
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        secure: !mode.includes('dev')
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      secure: !mode.includes('dev'),
+      httpOnly: true,
+      sameSite: 'lax' // Add this line
     }
-}));
+  }));
 
 // Set EJS as the view engine and record the location of the views directory
 app.set('view engine', 'ejs');
@@ -123,6 +125,5 @@ if (mode.includes('dev')) {
 // Start the Express server
 app.listen(port, async () => {
     await testDatabase();
-    await setupDatabase();
     console.log(`Server running on http://127.0.0.1:${port}`);
 });

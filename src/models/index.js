@@ -51,6 +51,7 @@ export const testDatabase = async () => {
         `);
         if (res.rows.length === 0) {
             console.log('No tables found in the database.');
+            await setupDatabase();
         } else {
             console.log('Tables in the database:', res.rows.map(row => row.table_name));
         }
