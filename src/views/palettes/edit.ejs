@@ -140,6 +140,7 @@
         // Initialize with existing colors if editing
         if (colorsInput.value && colorsInput.value !== '[]') {
             const colors = JSON.parse(colorsInput.value);
+            colorsInput.value = '[]';
             colors.forEach(color => {
                 addColorToList(color);
             });
