@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize color picker if on create/edit palette page
-    initColorPicker();
+    // initColorPicker(); // Commented out for debugging
     
     // Initialize admin panel functionality
     initAdminPanel();
@@ -80,90 +80,6 @@ function copyToClipboard(text) {
     
     // Remove temporary element
     document.body.removeChild(input);
-}
-
-/**
- * Initialize color picker functionality
- */
-function initColorPicker() {
-    const colorPicker = document.getElementById('color-picker');
-    const addColorBtn = document.getElementById('add-color');
-    const colorsList = document.getElementById('colors-list');
-    const colorPreview = document.getElementById('color-preview');
-    const colorInput = document.getElementById('color-input');
-    const colorsInput = document.getElementById('colors');
-    
-    if (!colorPicker) return;
-    
-    // Update preview when color picker changes
-    colorInput.addEventListener('input', function() {
-        colorPreview.style.backgroundColor = this.value;
-    });
-    
-    // Add color to palette
-    addColorBtn.addEventListener('click', function() {
-        const color = colorInput.value;
-        addColorToList(color);
-    });
-    
-    // Initialize with existing colors if editing
-    if (colorsInput.value) {
-        const colors = JSON.parse(colorsInput.value);
-        colors.forEach(color => {
-            addColorToList(color);
-        });
-    }
-    
-    // Add color to list and update hidden input
-    function addColorToList(color) {
-        // Check if we've reached the maximum number of colors (10)
-        // if (colorsList.children.length >= 10) {
-        //     alert('Maximum of 10 colors allowed per palette');
-        //     return;
-        // }
-        
-        // Create color item
-        const colorItem = document.createElement('div');
-        colorItem.className = 'color-item';
-        colorItem.style.backgroundColor = color;
-        colorItem.setAttribute('data-color', color);
-        
-        // Add remove button
-        const removeBtn = document.createElement('span');
-        removeBtn.className = 'color-remove';
-        removeBtn.innerHTML = '&times;';
-        removeBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            colorItem.remove();
-            updateColorsInput();
-        });
-        
-        colorItem.appendChild(removeBtn);
-        colorsList.appendChild(colorItem);
-        
-        // Update hidden input with all colors
-        updateColorsInput();
-    }
-    
-    // Update hidden input with current colors
-    function updateColorsInput() {
-        const colors = [];
-        document.querySelectorAll('.color-item').forEach(item => {
-            colors.push(item.getAttribute('data-color'));
-        });
-        
-        colorsInput.value = JSON.stringify(colors);
-    }
-    
-    // Make colors sortable
-    if (typeof Sortable !== 'undefined') {
-        new Sortable(colorsList, {
-            animation: 150,
-            onEnd: function() {
-                updateColorsInput();
-            }
-        });
-    }
 }
 
 /**
