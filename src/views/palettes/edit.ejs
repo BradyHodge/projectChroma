@@ -52,7 +52,7 @@
                 </div>
                 
                 <!-- Hidden input to store colors array -->
-                <input type="hidden" id="colors" name="colors" value="<%= typeof formData !== 'undefined' && formData.colors ? JSON.stringify(formData.colors) : JSON.stringify(palette.colors) %>">
+                <input type="hidden" id="colors" name="colors" value="<%= typeof formData !== 'undefined' && formData.colors ? formData.colors : JSON.stringify(palette.colors) %>">
                 
                 <div class="color-schemes">
                     <label>Generate Color Scheme:</label>
@@ -139,10 +139,13 @@
         
         // Initialize with existing colors if editing
         if (colorsInput.value && colorsInput.value !== '[]') {
+            console.log("Adding existing colors") // debugging
+            console.log('hidden colors array:', colorsInput.value); // debugging
             const colors = JSON.parse(colorsInput.value);
             colors.forEach(color => {
                 addColorToList(color);
             });
+            console.log('hidden colors array after population:', colorsInput.value); // debugging
         }
         
         // Add color to list and update hidden input

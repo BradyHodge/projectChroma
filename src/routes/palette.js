@@ -353,6 +353,21 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
 router.post(
     '/:id/edit',
     isAuthenticated,
+    (req, res, next) => {
+        if (typeof req.body.colors === 'string') {
+            try {
+                req.body.colors = JSON.parse(req.body.colors);
+            } catch (err) {
+                console.error('Failed to parse colors:', err);
+            }
+        }
+        if (req.body.isPublic === 'true') {
+            req.body.isPublic = true;
+        } else if (req.body.isPublic === 'false') {
+            req.body.isPublic = false;
+        }
+        next();
+    },
     [
         body('name').trim().isLength({ min: 3, max: 100 }).withMessage('Palette name must be between 3 and 100 characters'),
         body('description').trim().isLength({ max: 500 }).withMessage('Description cannot exceed 500 characters'),
